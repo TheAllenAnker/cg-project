@@ -140,6 +140,7 @@ window.onload = function init() {
     modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
     projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
     normalMatrixLoc = gl.getUniformLocation(program, "normalMatrix");
+    scaleMatrixLoc = gl.getUniformLocation(program, "scaleMatrix");
 
     document.getElementById("Button0").onclick = function () {
         radius *= 2.0;
@@ -198,13 +199,14 @@ function render() {
     eye = vec3(radius * Math.sin(theta) * Math.cos(phi),
         radius * Math.sin(theta) * Math.sin(phi), radius * Math.cos(theta));
 
-    scaleMatrix = scalem();
+    scaleMatrix = scalem(width, height, depth);
     modelViewMatrix = lookAt(eye, at, up);
     projectionMatrix = ortho(left, right, bottom, ytop, near, far);
+    //projectionMatrix = perspective(fovy, aspect, near, far);
 
     // normal matrix only really need if there is nonuniform scaling
     // it's here for generality but since there is
-    // no scaling in this example we could just use modelView matrix in shaders
+    // no scaling in this example we could just use modelViewMatrix matrix in shaders
 
     normalMatrix = [
         vec3(modelViewMatrix[0][0], modelViewMatrix[0][1], modelViewMatrix[0][2]),
@@ -215,6 +217,7 @@ function render() {
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
     gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
     gl.uniformMatrix3fv(normalMatrixLoc, false, flatten(normalMatrix));
+    gl.uniformMatrix4fv(scaleMatrixLoc, false, flatten(scaleMatrix));
 
     for (var i = 0; i < index; i += 3)
         gl.drawArrays(gl.TRIANGLES, i, 3);

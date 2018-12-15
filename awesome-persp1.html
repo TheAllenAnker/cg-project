@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<script id="vertex-shader" type="x-shader/x-vertex">
+attribute  vec4 vPosition;//初始的顶点位置
+attribute  vec3 vNormal;//初始的顶点法向量
+uniform vec4 lightPosition;//光源
+uniform vec4 ambientProduct, diffuseProduct, specularProduct;//入射光和反射系数乘积I*k
+uniform float shininess;//镜面反射的高光系数
+uniform mat4 modelViewMatrix;//模视矩阵
+uniform mat4 projectionMatrix;//投影矩阵
+uniform mat4 scaleMatrix;
+varying vec4 fColor;
+
+void main()
+{
+    //VC与WC重合，眼睛在原点处，计算L,N,V,H, 其中物体在运动，N,V都和物体表面位置有关！
+	vec3 light = lightPosition.xyz; //JS中是平行光var lightPosition = vec4(1.0, 1.0, 1.0, 0.0 );
+    vec3 L = normalize( light );	//入射光矢量是平行光，并且单位化
+
+	vec3 pos = (modelViewMatrix * vPosition).xyz; //旋转变换后的顶点位置
+	vec4 NN = vec4(vNormal,0);	                   //转换为vec4
+    vec3 N = normalize( (modelViewMatrix*NN).xyz);  //物体表面位置有变，法向量也变
+	vec3 V = normalize(-pos );                    //观察方向矢量v=0-pos, 并且单位矢V量
+	vec3 H = normalize( L + V );                   //单位化半角向量  H=(L+V)/2,这里直接单位化
+
+    // Compute terms in the illumination equation
+    vec4 ambient = ambientProduct;
+
+    float d = max( dot(L, N), 0.0 );
+    vec4  diffuse = d*diffuseProduct;
+
+    float s = pow( max(dot(N, H), 0.0), shininess );
+    vec4  specular = s * specularProduct;
+    if( dot(L, N) < 0.0 ) {	specular = vec4(0.0, 0.0, 0.0, 1.0); }
+
+	//final position and color
+    gl_Position = scaleMatrix * projectionMatrix * modelViewMatrix * vPosition;
+    //gl_Position = projectionMatrix * modelViewMatrix * vPosition;
+    fColor = ambient + diffuse + specular;
+    fColor.a = 1.0;
+}
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+precision mediump float;
+varying vec4 fColor;
+void
+main()
+{
+    gl_FragColor = fColor;
+}
+</script>
+
+<script type="text/javascript" src="commons/webgl-utils.js"></script>
+<script type="text/javascript" src="commons/initShaders.js"></script>
+<script type="text/javascript" src="commons/MV.js"></script>
+<script type="text/javascript" src="awesome-persp1.js"></script>
+
+<body>
+<canvas id="gl-canvas" width="512" height="512">
+    Oops ... your browser doesn't support the HTML5 canvas element
+</canvas>
+<button id = "ButtonX">Rotate X</button>
+<button id = "ButtonY">Rotate Y</button>
+<button id = "ButtonZ">Rotate Z</button>
+<button id = "ButtonT">Toggle Rotation</button>
+<br>
+<div style="display: block;float: left;border-style: solid;">
+    width&nbsp;0<input id="width" type="range"
+                       min="0" max="2" step="0.01" value="1"  title=""/>2 <br>
+    height&nbsp;0<input id="height" type="range"
+                        min="0" max="2" step="0.01" value="1" title=""/>2 <br>
+    depth&nbsp;0<input id="depth" type="range"
+                       min="0" max="2" step="0.01" value="1" title=""/>2
+</div>
+
+<div style="display: block;float:left;clear: right;border-style: solid;">
+    radius&nbsp;0.05<input id="radius" type="range"
+                           min="0.05" max="2" step="0.01" value="1.0" title=""/>2 <br>
+    theta&nbsp;-180<input id="theta" type="range"
+                          min="-180" max="180" step="0.01" value="0" title=""/>180 <br>
+    phi&nbsp;-90<input id="phi" type="range"
+                       min="-90" max="90" step="0.01" value="0" title=""/>90 <br>
+</div>
+<button id="changeBtn" style="">ortho/perspective</button>
+<div style="display: block;float: left;clear:both;">
+    <p id="eye">eye(radius,theta,phi):&nbsp;1.0,0.0,0.0</p>
+    <p id="eye2">Cartesian&nbsp;eye(x,y,z):&nbsp;1.0,0.0,0.0</p>
+</div>
+</body>
+</html>

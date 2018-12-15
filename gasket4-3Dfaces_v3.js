@@ -70,17 +70,6 @@ var height = 1.0;
 var depth = 1.0;
 var changeProj = true;
 
-// specifying a light source
-var lightPosition = vec4(1.0, 1.0, 1.0, 0.0);
-var lightAmbient = vec4(0.2, 0.2, 0.2, 1.0);
-var lightDiffuse = vec4(1.0, 1.0, 1.0, 1.0);
-var lightSpecular = vec4(1.0, 1.0, 1.0, 1.0);
-// specifying material properties
-var materialAmbient = vec4(1.0, 0.0, 1.0, 1.0);
-var materialDiffuse = vec4(1.0, 0.8, 0.0, 1.0);
-var materialSpecular = vec4(1.0, 1.0, 1.0, 1.0);
-var materialShininess = 20.0;
-
 window.onload = function init() {
     //=====================================================
     //  Initialize our data for the Sierpinski Gasket
@@ -109,15 +98,6 @@ window.onload = function init() {
     var program = initShaders(gl, "vertex-shader", "fragment-shader");
     gl.useProgram(program);
 
-    // calculate the parameters for coloring the object with the light
-    var ambientProduct = mult(lightAmbient, materialAmbient);
-    var diffuseProduct = mult(lightDiffuse, materialDiffuse);
-    var specularProduct = mult(lightSpecular, materialSpecular);
-
-    var vNormal = gl.getAttribLocation(program, "vNormal");
-    gl.vertexAttribPointer(vNormal, 4, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(vNormal);
-
     //==================================================================
 
     // Create a buffer object, initialize it, and associate it with the
@@ -131,7 +111,6 @@ window.onload = function init() {
 
     //并关联属性变量vColor和顶点着色器中的颜色变量“vColor”.
 
-    /*
     //传递数据到GPU：
     var cBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
@@ -144,7 +123,6 @@ window.onload = function init() {
     //开启着色器中的属性变量
     gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
     //传递当前缓存数据到GPU
-    */
 
 
     //创建顶点位置缓存为当前缓存，将JS顶点数组points转换后放入vBuffer.
@@ -214,19 +192,6 @@ window.onload = function init() {
     document.getElementById("changeBtn").onclick = function (event) {
         changeProj = !changeProj;
     };
-
-    // pass parameters to shader for later coloring of the object
-    gl.uniform4fv(gl.getUniformLocation(program,
-        "ambientProduct"), flatten(ambientProduct));
-    gl.uniform4fv(gl.getUniformLocation(program,
-        "diffuseProduct"), flatten(diffuseProduct));
-    gl.uniform4fv(gl.getUniformLocation(program,
-        "specularProduct"), flatten(specularProduct));
-    gl.uniform4fv(gl.getUniformLocation(program,
-        "lightPosition"), flatten(lightPosition));
-    gl.uniform1f(gl.getUniformLocation(program,
-        "shininess"), materialShininess);
-
 
     render();
 };
