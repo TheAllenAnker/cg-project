@@ -4,12 +4,14 @@
 <script id="vertex-shader" type="x-shader/x-vertex">
 attribute  vec4 vPosition;//初始的顶点位置
 attribute  vec3 vNormal;//初始的顶点法向量
+
 uniform vec4 lightPosition;//光源
 uniform vec4 ambientProduct, diffuseProduct, specularProduct;//入射光和反射系数乘积I*k
 uniform float shininess;//镜面反射的高光系数
 uniform mat4 modelViewMatrix;//模视矩阵
 uniform mat4 projectionMatrix;//投影矩阵
 uniform mat4 scaleMatrix;
+
 varying vec4 fColor;
 
 void main()
@@ -58,13 +60,13 @@ main()
 <script type="text/javascript" src="awesome-persp1.js"></script>
 
 <body>
-<canvas id="gl-canvas" width="512" height="512">
+<canvas id="gl-canvas" width="600" height="600">
     Oops ... your browser doesn't support the HTML5 canvas element
 </canvas>
 <button id = "ButtonX">Rotate X</button>
 <button id = "ButtonY">Rotate Y</button>
 <button id = "ButtonZ">Rotate Z</button>
-<button id = "ButtonT">Toggle Rotation</button>
+<button id = "ButtonT">Resume/Pause Rotation</button>
 <br>
 <div style="display: block;float: left;border-style: solid;">
     width&nbsp;0<input id="width" type="range"
@@ -79,13 +81,12 @@ main()
     radius&nbsp;0.05<input id="radius" type="range"
                            min="0.05" max="2" step="0.01" value="1.0" title=""/>2 <br>
     theta&nbsp;-180<input id="theta" type="range"
-                          min="-180" max="180" step="0.01" value="0" title=""/>180 <br>
+                          min="-180" max="180" step="0.01" value="90" title=""/>180 <br>
     phi&nbsp;-90<input id="phi" type="range"
                        min="-90" max="90" step="0.01" value="0" title=""/>90 <br>
 </div>
-<button id="changeBtn" style="">ortho/perspective</button>
 <div style="display: block;float: left;clear:both;">
-    <p id="eye">eye(radius,theta,phi):&nbsp;1.0,0.0,0.0</p>
+    <p id="eye">eye(radius,theta,phi):&nbsp;1.0,90.0,0.0</p>
     <p id="eye2">Cartesian&nbsp;eye(x,y,z):&nbsp;1.0,0.0,0.0</p>
 </div>
 </body>

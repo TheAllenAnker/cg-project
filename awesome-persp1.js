@@ -23,6 +23,12 @@ var vertices = [
     vec4( 0.5, -0.5, -0.5, 1.0 )
 ];
 
+// for (let i = 0; i < 8; i++) {
+//     for (let j = 0; j < 3; j++) {
+//         vertices[i][j] += 0.25;
+//     }
+// }
+
 var lightPosition = vec4(1.0, 1.0, 1.0, 0.0 );//A=0表示无穷远光及方向，A=1表示点光源及位置
 
 var lightAmbient = vec4(0.2, 0.2, 0.2, 1.0 );
@@ -68,10 +74,10 @@ const aspect = 1;
 
 var numVertices = 36;
 
-var width = 1.0;
-var height = 1.0;
+var width = 0.5;
+var height = 0.5;
 var depth = 1.0;
-var changeProj = true;
+var isOrtho = true;
 
 var program;
 
@@ -85,7 +91,7 @@ var axis = 0;
 var thetaRotate =[0, 0, 0];
 var thetaLoc;
 
-var flag = true;//Toggle Rotation 开启结束旋转
+var flag = false;//Toggle Rotation 开启结束旋转
 
 //立方体每个面6个顶点位置及法向量,先计算每个面的法向量，
 //然后，每个面分成两个三角形，按顺序分别将其顶点位置写入pointsArray数组，
@@ -219,10 +225,50 @@ window.onload = function init() {
         var z = radius * Math.cos(theta);
         p2.innerHTML = "eye(x,y,z): " + x + ", " + y + ", " + z;
     };
-
-
-    document.getElementById("changeBtn").onclick = function (event) {
-        changeProj = !changeProj;
+    // keydown listener for the keyboard events
+    document.onkeydown = function(){
+        // 'O' keydown
+        if (event.keyCode === 79) {
+            isOrtho = true;
+        }
+        // 'P' keydown
+        if (event.keyCode === 80) {
+            isOrtho = false;
+        }
+        // 'W' keydown
+        if (event.keyCode === 87) {
+            axis = yAxis;
+            thetaRotate[axis] += 2.0;
+        }
+        // 'A' keydown
+        if (event.keyCode === 65) {
+            axis = zAxis;
+            thetaRotate[axis] -= 2.0;
+        }
+        // 'S' keydown
+        if (event.keyCode === 83) {
+            axis = yAxis;
+            thetaRotate[axis] -= 2.0;
+        }
+        // 'D' keydown
+        if (event.keyCode === 68) {
+            axis = zAxis;
+            thetaRotate[axis] += 2.0;
+        }
+        // 'Q' keydown
+        if (event.keyCode === 81) {
+            axis = xAxis;
+            thetaRotate[axis] -= 2.0;
+        }
+        // 'E' keydown
+        if (event.keyCode === 69) {
+            axis = xAxis;
+            thetaRotate[axis] += 2.0;
+        }
+        // 'Space' keydown
+        if (event.keyCode === 32) {
+            flag = !flag;
+        }
     };
 
     //进行渲染
@@ -245,7 +291,7 @@ var render = function(){
     modelViewMatrix = mult(modelViewMatrix, rotate(thetaRotate[zAxis], [0, 0, 1] ));
 
     scaleMatrix = scalem(width, height, depth);
-    if (changeProj) {
+    if (isOrtho) {
         projectionMatrix = ortho(left, right, bottom, vtop, near, far);//wc下正交投影裁剪范围
     } else {
         projectionMatrix = perspective(fovy, aspect, near, far);
