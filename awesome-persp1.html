@@ -2,8 +2,9 @@
 
 <html lang="en">
 <script id="vertex-shader" type="x-shader/x-vertex">
-attribute  vec4 vPosition;//初始的顶点位置
-attribute  vec3 vNormal;//初始的顶点法向量
+attribute vec4 vPosition;//初始的顶点位置
+attribute vec3 vNormal;//初始的顶点法向量
+attribute vec2 aTextCoords;// texture coordinates
 
 uniform vec4 lightPosition;//光源
 uniform vec4 ambientProduct, diffuseProduct, specularProduct;//入射光和反射系数乘积I*k
@@ -11,8 +12,10 @@ uniform float shininess;//镜面反射的高光系数
 uniform mat4 modelViewMatrix;//模视矩阵
 uniform mat4 projectionMatrix;//投影矩阵
 uniform mat4 scaleMatrix;
+uniform mat4 uMvpMatrix;
 
 varying vec4 fColor;
+varying vec2 vTextCoords;
 
 void main()
 {
@@ -38,19 +41,23 @@ void main()
 
 	//final position and color
     gl_Position = scaleMatrix * projectionMatrix * modelViewMatrix * vPosition;
-    //gl_Position = projectionMatrix * modelViewMatrix * vPosition;
     fColor = ambient + diffuse + specular;
     fColor.a = 1.0;
+
+    vTextCoords = aTextCoords;
 }
 </script>
 
 <script id="fragment-shader" type="x-shader/x-fragment">
 precision mediump float;
+
 varying vec4 fColor;
-void
-main()
-{
-    gl_FragColor = fColor;
+varying vec2 vTextCoords;
+
+uniform sampler2D uTextureSampler;
+
+void main() {
+    gl_FragColor = fColor * texture2D(uTextureSampler, vTextCoords);
 }
 </script>
 
