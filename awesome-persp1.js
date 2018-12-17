@@ -410,13 +410,23 @@ window.onload = function init() {
         scrollFlag = !scrollFlag;
     };
 
-    document.getElementById("increSub").onclick = function () {
+    document.getElementById("increSub").onclick = function(){
         numTimesToSubdivide++;
         index = 72;
+        pointsArray = [];
+        normalsArray = [];
+        textureCoordsArray = [];
+        colorCube();//立方体的所有顶点位置和法向量写入缓存
+        tetrahedron(va, vb, vc, vd, numTimesToSubdivide);
     };
-    document.getElementById("decreSub").onclick = function () {
-        if (numTimesToSubdivide) numTimesToSubdivide--;
+    document.getElementById("decreSub").onclick = function(){
+        if(numTimesToSubdivide) numTimesToSubdivide--;
         index = 72;
+        pointsArray = [];
+        normalsArray = [];
+        textureCoordsArray = [];
+        colorCube();//立方体的所有顶点位置和法向量写入缓存
+        tetrahedron(va, vb, vc, vd, numTimesToSubdivide);
     };
 
     //进行渲染
