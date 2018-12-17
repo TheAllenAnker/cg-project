@@ -21,8 +21,25 @@ var vertices = [
     vec4(-0.5, -0.5, -0.5, 1.0),
     vec4(-0.5, 0.5, -0.5, 1.0),
     vec4(0.5, 0.5, -0.5, 1.0),
-    vec4(0.5, -0.5, -0.5, 1.0)
+    vec4(0.5, -0.5, -0.5, 1.0),
+
+    vec4(-0.5, -0.5, 0.5, 0.8),
+    vec4(-0.5, 0.5, 0.5, 0.8),
+    vec4(0.5, 0.5, 0.5, 0.8),
+    vec4(0.5, -0.5, 0.5, 0.8),
+    vec4(-0.5, -0.5, -0.5, 0.8),
+    vec4(-0.5, 0.5, -0.5, 0.8),
+    vec4(0.5, 0.5, -0.5, 0.8),
+    vec4(0.5, -0.5, -0.5, 0.8)
 ];
+// set the coordinates for the two objects
+for (let i = 0; i < 8; i++) {
+    vertices[i][0] -= 1.5;
+}
+
+for (let i = 8; i < 16; i++) {
+    vertices[i][0] += 1.0;
+}
 
 var textureCoord = [
     vec2(0, 0),
@@ -30,12 +47,6 @@ var textureCoord = [
     vec2(1, 1),
     vec2(1, 0)
 ];
-
-// for (let i = 0; i < 8; i++) {
-//     for (let j = 0; j < 3; j++) {
-//         vertices[i][j] += 0.25;
-//     }
-// }
 
 var lightPosition = vec4(1.0, 1.0, 1.0, 0.0);//A=0表示无穷远光及方向，A=1表示点光源及位置
 
@@ -82,8 +93,8 @@ const aspect = 1;
 
 var numVertices = 36;
 
-var width = 0.5;
-var height = 0.5;
+var width = 0.3;
+var height = 0.3;
 var depth = 1.0;
 var isOrtho = true;
 
@@ -100,6 +111,8 @@ var thetaRotate = [0, 0, 0];
 var thetaLoc;
 
 var flag = false;//Toggle Rotation 开启结束旋转
+var fogFlag = false; // fog control
+var scrollFlag = false; // prevent the page from scrolling when the mouse wheel is scrolling
 
 //立方体每个面6个顶点位置及法向量,先计算每个面的法向量，
 //然后，每个面分成两个三角形，按顺序分别将其顶点位置写入pointsArray数组，
@@ -144,8 +157,14 @@ function colorCube() {
     quad(6, 5, 1, 2);
     quad(4, 5, 6, 7);
     quad(5, 4, 0, 1);
-}
 
+    quad(9, 8, 11, 10);
+    quad(10, 11, 15, 14);
+    quad(11, 8, 12, 15);
+    quad(14, 13, 9, 10);
+    quad(12, 13, 14, 15);
+    quad(13, 12, 8, 9);
+}
 
 window.onload = function init() {
     //============init WebGL
@@ -232,6 +251,9 @@ window.onload = function init() {
     document.getElementById("ButtonT").onclick = function () {
         flag = !flag;
     };
+    document.getElementById("fogBtn").onclick = function () {
+        fogFlag  = !fogFlag;
+    };
 
     document.getElementById("width").onchange = function (event) {
         width = event.target.value;
@@ -309,8 +331,19 @@ window.onload = function init() {
         }
         // 'Space' keydown
         if (event.keyCode === 32) {
+            event.preventDefault();
             flag = !flag;
         }
+    };
+
+    if (document.addEventListener) {
+        document.addEventListener("DOMMouseScroll", scrollFunc, false);
+    } // w3c
+    window.onmousewheel = document.onmousewheel = document.onmousewheel = scrollFunc; // IE/Opera/Chrome
+
+    // enable/disable scrolling
+    canvas.onclick = function(event) {
+        scrollFlag = !scrollFlag;
     };
 
     //进行渲染
@@ -326,6 +359,10 @@ var render = function () {
         radius * Math.cos(theta));
 
     if (flag) thetaRotate[axis] += 2.0;
+
+    if (fogFlag) {
+
+    }
 
     modelViewMatrix = lookAt(eye, at, up);
     modelViewMatrix = mult(modelViewMatrix, rotate(thetaRotate[xAxis], [1, 0, 0]));
@@ -343,7 +380,9 @@ var render = function () {
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "modelViewMatrix"), false, flatten(modelViewMatrix));//传递旋转变换矩阵，即模视矩阵
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "scaleMatrix"), false, flatten(scaleMatrix));
     gl.drawArrays(gl.TRIANGLES, 0, numVertices);//启动shader绘制三角形，numVertices初始化为36（6*6=36个三角形顶点）
-
+    gl.depthMask(false);
+    gl.drawArrays(gl.TRIANGLES, 36, numVertices);
+    gl.depthMask(true);
     requestAnimFrame(render);//双帧切换
 };
 
@@ -358,3 +397,27 @@ function configureTexture(texture, image) {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
     gl.uniform1i(gl.getUniformLocation(program, "uTextureSampler"), 0);
 }
+
+var scrollFunc = function (event) {
+    event = event || window.event;
+    if (!scrollFlag) {
+        event.preventDefault();
+        if (event.wheelDelta) { // IE/Opera/Chrome
+            if (event.wheelDelta > 0) {
+                width = width + 0.02 <= 2 ? width + 0.02 : width;
+                height = height + 0.02 <= 2 ? height + 0.02 : height;
+            } else {
+                width = width - 0.02 >= 0 ? width - 0.02 : width;
+                height = height - 0.02 >= 0 ? height - 0.02 : height;
+            }
+        } else if (event.detail) { // Firefox
+            if (event.detail < 0) {
+                width = width + 0.02 <= 2 ? width + 0.02 : width;
+                height = height + 0.02 <= 2 ? height + 0.02 : height;
+            } else {
+                width = width - 0.02 >= 0 ? width - 0.02 : width;
+                height = height - 0.02 >= 0 ? height - 0.02 : height;
+            }
+        }
+    }
+};
