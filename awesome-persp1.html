@@ -1,6 +1,9 @@
 <!DOCTYPE html>
-
 <html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8">
+    <title>Awesome Cubes</title>
+</head>
 <script id="vertex-shader" type="x-shader/x-vertex">
 attribute vec4 vPosition;//初始的顶点位置
 attribute vec3 vNormal;//初始的顶点法向量
@@ -47,6 +50,7 @@ void main()
     vTextCoords = aTextCoords;
 }
 
+
 </script>
 
 <script id="fragment-shader" type="x-shader/x-fragment">
@@ -61,6 +65,7 @@ void main() {
     gl_FragColor = fColor * texture2D(uTextureSampler, vTextCoords);
 }
 
+
 </script>
 
 <script type="text/javascript" src="commons/webgl-utils.js"></script>
@@ -69,35 +74,57 @@ void main() {
 <script type="text/javascript" src="awesome-persp1.js"></script>
 
 <body>
-<canvas id="gl-canvas" width="1200" height="1200">
+<canvas id="gl-canvas" width="1080" height="960" style="float: left;">
     Oops ... your browser doesn't support the HTML5 canvas element
 </canvas>
-<button id="ButtonX">Rotate X</button>
-<button id="ButtonY">Rotate Y</button>
-<button id="ButtonZ">Rotate Z</button>
-<button id="ButtonT">Resume/Pause Rotation</button>
-<button id="fogBtn">With/Without Fog</button>
-<br>
-<div style="display: block;float: left;border-style: solid;">
-    width&nbsp;0<input id="width" type="range"
-                       min="0" max="2" step="0.01" value="1" title=""/>2 <br>
-    height&nbsp;0<input id="height" type="range"
-                        min="0" max="2" step="0.01" value="1" title=""/>2 <br>
-    depth&nbsp;0<input id="depth" type="range"
-                       min="0" max="2" step="0.01" value="1" title=""/>2
-</div>
+<div class="controlBox" style="display: block;">
+    <div class="buttons">
+        <button id="ButtonX">Rotate X</button>
+        <button id="ButtonY">Rotate Y</button>
+        <button id="ButtonZ">Rotate Z</button>
+        <button id="ButtonT">Resume/Pause Rotation</button>
+        <button id="fogBtn" style="float:left;">With/Without Fog</button>
+    </div>
+    <br>
+    <div style="display: block;float: left;border-style: solid;">
+        <label for="width">width 0</label>
+        <input id="width" type="range"
+               min="0" max="1" step="0.01" value="0.3" title=""/>1<br>
+        <label for="height">height 0</label>
+        <input id="height" type="range"
+               min="0" max="1" step="0.01" value="0.3" title=""/>1<br>
+        <label for="depth">depth 0</label>
+        <input id="depth" type="range"
+               min="0" max="1" step="0.01" value="1" title=""/>1
+    </div>
 
-<div style="display: block;float:left;clear: right;border-style: solid;">
-    radius&nbsp;0.05<input id="radius" type="range"
-                           min="0.05" max="2" step="0.01" value="1.0" title=""/>2 <br>
-    theta&nbsp;-180<input id="theta" type="range"
-                          min="-180" max="180" step="0.01" value="90" title=""/>180 <br>
-    phi&nbsp;-90<input id="phi" type="range"
-                       min="-90" max="90" step="0.01" value="0" title=""/>90 <br>
+    <div style="display: block;float:left;clear: right;border-style: solid;">
+        radius&nbsp;0.05<input id="radius" type="range"
+                               min="0.05" max="2" step="0.01" value="1.0" title=""/>2 <br>
+        theta&nbsp;-180<input id="theta" type="range"
+                              min="-180" max="180" step="0.01" value="90" title=""/>180 <br>
+        phi&nbsp;-90<input id="phi" type="range"
+                           min="-90" max="90" step="0.01" value="0" title=""/>90 <br>
+    </div>
+    <div style="display: block;float: left;clear: right;">
+        <p id="eye">eye(radius,theta,phi):&nbsp;1.0,90.0,0.0</p>
+        <p id="eye2">Cartesian&nbsp;eye(x,y,z):&nbsp;1.0,0.0,0.0</p>
+    </div>
 </div>
-<div style="display: block;float: left;clear:both;">
-    <p id="eye">eye(radius,theta,phi):&nbsp;1.0,90.0,0.0</p>
-    <p id="eye2">Cartesian&nbsp;eye(x,y,z):&nbsp;1.0,0.0,0.0</p>
+<div class="instructionBox" style="display: block;float: left;margin-left: 80px">
+    <p>
+        操作说明：<br>
+        鼠标点击画板区域切换鼠标滚轮控制：页面上下移动/物体缩放 <br>
+        键盘控制：<br>
+        W: 绕 y 轴逆时针旋转 <br>
+        S: 绕 y 轴顺时针旋转 <br>
+        A:
+        D:
+        Q:
+        E:
+        空格(Space): 控制物体旋转暂停/开始
+    </p>
 </div>
+<br>
 </body>
 </html>

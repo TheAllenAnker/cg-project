@@ -112,7 +112,7 @@ var thetaLoc;
 
 var flag = false;//Toggle Rotation 开启结束旋转
 var fogFlag = false; // fog control
-var scrollFlag = false; // prevent the page from scrolling when the mouse wheel is scrolling
+var scrollFlag = true; // prevent the page from scrolling when the mouse wheel is scrolling
 
 //立方体每个面6个顶点位置及法向量,先计算每个面的法向量，
 //然后，每个面分成两个三角形，按顺序分别将其顶点位置写入pointsArray数组，
@@ -252,7 +252,7 @@ window.onload = function init() {
         flag = !flag;
     };
     document.getElementById("fogBtn").onclick = function () {
-        fogFlag  = !fogFlag;
+        fogFlag = !fogFlag;
     };
 
     document.getElementById("width").onchange = function (event) {
@@ -342,7 +342,7 @@ window.onload = function init() {
     window.onmousewheel = document.onmousewheel = document.onmousewheel = scrollFunc; // IE/Opera/Chrome
 
     // enable/disable scrolling
-    canvas.onclick = function(event) {
+    canvas.onclick = function (event) {
         scrollFlag = !scrollFlag;
     };
 
@@ -403,21 +403,25 @@ var scrollFunc = function (event) {
     if (!scrollFlag) {
         event.preventDefault();
         if (event.wheelDelta) { // IE/Opera/Chrome
-            if (event.wheelDelta > 0) {
+            if (event.wheelDelta < 0) {
                 width = width + 0.02 <= 2 ? width + 0.02 : width;
                 height = height + 0.02 <= 2 ? height + 0.02 : height;
             } else {
                 width = width - 0.02 >= 0 ? width - 0.02 : width;
                 height = height - 0.02 >= 0 ? height - 0.02 : height;
             }
+            document.getElementById("width").value = width;
+            document.getElementById("height").value = height;
         } else if (event.detail) { // Firefox
-            if (event.detail < 0) {
+            if (event.detail > 0) {
                 width = width + 0.02 <= 2 ? width + 0.02 : width;
                 height = height + 0.02 <= 2 ? height + 0.02 : height;
             } else {
                 width = width - 0.02 >= 0 ? width - 0.02 : width;
                 height = height - 0.02 >= 0 ? height - 0.02 : height;
             }
+            document.getElementById("width").value = width;
+            document.getElementById("height").value = height;
         }
     }
 };
