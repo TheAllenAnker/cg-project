@@ -128,7 +128,6 @@ var thetaRotate = [0, 0, 0];
 var thetaLoc;
 
 var flag = false;//Toggle Rotation 开启结束旋转
-var fogFlag = false; // fog control
 var scrollFlag = true; // prevent the page from scrolling when the mouse wheel is scrolling
 
 var numTimesToSubdivide = 3;
@@ -319,9 +318,6 @@ window.onload = function init() {
     document.getElementById("ButtonT").onclick = function () {
         flag = !flag;
     };
-    document.getElementById("fogBtn").onclick = function () {
-        fogFlag = !fogFlag;
-    };
 
     document.getElementById("width").onchange = function (event) {
         width = event.target.value;
@@ -414,6 +410,15 @@ window.onload = function init() {
         scrollFlag = !scrollFlag;
     };
 
+    document.getElementById("increSub").onclick = function () {
+        numTimesToSubdivide++;
+        index = 72;
+    };
+    document.getElementById("decreSub").onclick = function () {
+        if (numTimesToSubdivide) numTimesToSubdivide--;
+        index = 72;
+    };
+
     //进行渲染
     render();
 };
@@ -427,10 +432,6 @@ var render = function () {
         radius * Math.cos(theta));
 
     if (flag) thetaRotate[axis] += 2.0;
-
-    if (fogFlag) {
-
-    }
 
     modelViewMatrix = lookAt(eye, at, up);
     modelViewMatrix = mult(modelViewMatrix, rotate(thetaRotate[xAxis], [1, 0, 0]));
@@ -450,10 +451,10 @@ var render = function () {
     gl.drawArrays(gl.TRIANGLES, 0, numVertices);//启动shader绘制三角形，numVertices初始化为36（6*6=36个三角形顶点）
     gl.depthMask(false);
     gl.drawArrays(gl.TRIANGLES, 36, numVertices);
-    gl.depthMask(true);
     for (var i = 72; i < index; i += 3) {
         gl.drawArrays(gl.TRIANGLES, i, 3);
     }
+    gl.depthMask(true);
     requestAnimFrame(render);//双帧切换
 };
 
